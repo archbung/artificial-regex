@@ -21,7 +21,6 @@ instance Show Regex where
   show (And rs) = "(" <> concatMap show rs <> ")"
   show (Or rs)  = "[" <> concatMap show rs <> "]"
 
--- TODO: need to properly divide the size
 instance Arbitrary Regex where
   arbitrary = genericArbitraryRec (1 % 1 % 1 % ()) 
     `withBaseCase` (Atom <$> arbitrary)
@@ -33,6 +32,7 @@ pRegex = Atom <$> lowerChar
   <|> And <$> (char '(' *> many pRegex <* char ')')
   <|> Or <$> (char '[' *> many pRegex <* char ']')
 
+-- Inputs are well-bracketed so this should be safe
 parse :: String -> Regex
 parse = fromJust . parseMaybe pRegex
 
