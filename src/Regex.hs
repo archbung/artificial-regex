@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 module Regex (Regex(..), parse, solve, eval, simplify) where
 
 import Text.Megaparsec hiding (parse)
@@ -6,12 +7,14 @@ import Data.Void
 import Data.List (nub, sortOn)
 import Data.Maybe (fromJust)
 import Test.QuickCheck
+import GHC.Generics
+import Generic.Random
 
 data Regex
   = Atom Char 
   | And [Regex]
   | Or [Regex]
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Generic)
 
 instance Show Regex where
   show (Atom c) = [c]
@@ -20,10 +23,8 @@ instance Show Regex where
 
 -- TODO: need to properly divide the size
 instance Arbitrary Regex where
-  arbitrary = sized regex'
-    where
-      regex' 0 = fmap Atom arbitrary
-      regex' _ = oneof [fmap Atom arbitrary, fmap And arbitrary, fmap Or arbitrary]
+  arbitrary = genericArbitraryRec (1 % 1 % 1 % ()) 
+    `withBaseCase` (Atom <$> arbitrary)
 
 type Parser = Parsec Void String
 

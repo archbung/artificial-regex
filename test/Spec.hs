@@ -19,5 +19,5 @@ main = hspec $ do
       show (simplify (parse "[[ab]]")) `shouldBe` "[ab]"
       show (simplify (parse "((a)b)")) `shouldBe` "(ab)"
       show (simplify (parse "[a[[bb]b[[b]]](c)(d)]")) `shouldBe` "[abcd]"
-    it "presevers the meaning" $ do
+    it "preserves the meaning" $ do
       property $ \r -> eval r == eval (simplify r)
