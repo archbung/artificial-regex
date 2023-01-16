@@ -29,7 +29,7 @@ instance Arbitrary Regex where
 type Parser = Parsec Void String
 
 pRegex :: Parser Regex
-pRegex = Atom <$> letterChar
+pRegex = Atom <$> lowerChar
   <|> And <$> (char '(' *> many pRegex <* char ')')
   <|> Or <$> (char '[' *> many pRegex <* char ']')
 
