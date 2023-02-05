@@ -20,8 +20,12 @@ main = hspec $ do
       show (simplify (parse "[[ab]]")) `shouldBe` "[ab]"
       show (simplify (parse "((a)b)")) `shouldBe` "(ab)"
       show (simplify (parse "[a[[bb]b[[b]]](c)(d)]")) `shouldBe` "[abcd]"
+
     it "preserves the meaning" $ do
       property $ \r -> eval r == eval (simplify r)
+
+    it "simplifies as far as possible" $ do
+      property $ \r -> simplify (simplify r) == simplify r
 
   describe "Regex.solve" $ do
     it "correctly solves simple problems" $ do
