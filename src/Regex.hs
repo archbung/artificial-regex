@@ -41,18 +41,22 @@ eval (Atom c) = [[c]]
 eval (Or rs)  = nub $ concatMap eval rs
 eval (And rs) = foldr ((\as zs -> [ a <> z | a <- as, z <- zs]) . eval) [""] rs
 
-simplify :: Regex -> Regex
-simplify (Atom c) = Atom c
-simplify (Or [r]) = simplify r
-simplify (Or rs)  = Or $ nub $ foldr (op . simplify) [] rs
+simplify' :: Regex -> Regex
+simplify' (Atom c) = Atom c
+simplify' (Or [r]) = simplify r
+simplify' (Or rs)  = Or $ nub $ foldr (op . simplify) [] rs
   where
     op (Or args) z = args <> z
     op a z = a:z
-simplify (And [r]) = simplify r
-simplify (And rs) = And $ foldr (op . simplify) [] rs
+simplify' (And [r]) = simplify r
+simplify' (And rs) = And $ foldr (op . simplify) [] rs
   where
     op (And args) z = args <> z
     op a z = a:z
+
+simplify :: Regex -> Regex
+simplify r | r == simplify' r = r
+           | otherwise = simplify (simplify' r)
 
 solve :: String -> [(Int, String, String)]
 solve = sortOn (\(x,_,_) -> x) . map ((\r -> (length (eval r), show r, show (simplify r))) . parse) . lines
